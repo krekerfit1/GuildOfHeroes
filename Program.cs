@@ -10,43 +10,53 @@ alexander.TakeDamage(10);
 alexander.Heal(10);
 
 Guild guild = new Guild("Гильдия героев");
-guild.Heroes.Add(yaroslav);
-guild.Heroes.Add(anastasia);
-guild.Heroes.Add(artem);
-guild.Heroes.Add(alexander);
-guild.Heroes.Add(sergey);
+guild.AddHero(yaroslav);
+guild.AddHero(anastasia);
+guild.AddHero(artem);
+guild.AddHero(alexander);
+guild.AddHero(sergey);
+
+List<Hero> members = guild.GetMembers(); // копия состава вот это да
 
 Console.WriteLine($">>> {guild.Name}: перекличка <<<");
-Console.WriteLine($"Участников: {guild.Heroes.Count}");
+Console.WriteLine($"Участников: {guild.MemberCount}");
 
-if (guild.Heroes.Count > 0) {
-    Console.WriteLine($"Первый: {guild.Heroes[0].Name}");
-    Console.WriteLine($"Последний: {guild.Heroes[guild.Heroes.Count - 1].Name}");
+if (members.Count > 0) {
+    Console.WriteLine($"Первый: {members[0].Name}");
+    Console.WriteLine($"Последний: {members[members.Count - 1].Name}");
 }
 
 Console.WriteLine();
-foreach (Hero hero in guild.Heroes) {
+foreach (Hero hero in members) {
     Console.WriteLine(hero.GetInfo());
     Console.WriteLine();
 }
 
-int strongCount = 0;
-foreach (Hero hero in guild.Heroes) {
-    if (hero.Health >= 120) {
-        strongCount += 1;
-    }
+Hero? found = guild.FindHeroByName(" аРтЁм ");
+if (found != null) {
+    Console.WriteLine($"Найден по запросу « аРтЁм »: {found.Name}");
+} else {
+    Console.WriteLine("По запросу « аРтЁм » никого нет.");
+    
 }
-Console.WriteLine($"Могут нести тяжёлые ящики (здоровье от 120): {strongCount}");
 
-if (guild.Heroes.Count > 0) {
-    Hero strongest = guild.Heroes[0];
-    foreach (Hero hero in guild.Heroes) {
-        if (hero.Health > strongest.Health) {
-            strongest = hero;
-        }
-    }
+
+
+Console.WriteLine($"Повтор Александра принят: {guild.AddHero(alexander)}");
+Console.WriteLine($"Удалён отсутствующий: {guild.RemoveHero("Борис")}");
+Console.WriteLine($"Участников после проверок: {guild.MemberCount}");
+
+Console.WriteLine($"Могут нести тяжёлые ящики (здоровье от 120): {guild.CountHealthy(120)}");
+
+Hero? strongest = guild.FindStrongest();
+if (strongest != null) {
     Console.WriteLine($"Самый здоровый: {strongest.Name} ({strongest.Health})");
 }
+
+
+
+
+
 
 
 //=============================================
@@ -59,39 +69,45 @@ Game game3 = new Game("Satisfactory", "Sandbox", 2024, 9.2, 120, true);
 Game game4 = new Game("DOOM", "Shooter", 2016, 8.8, 25, true);
 
 GameLibrary library = new GameLibrary("Моя библиотека игр");
-library.Games.Add(game1);
-library.Games.Add(game2);
-library.Games.Add(game3);
-library.Games.Add(game4); 
+Console.WriteLine($"Добавлен Witcher 3: {library.AddGame(game1)}");
+library.AddGame(game2);
+library.AddGame(game3);
+library.AddGame(game4);
 
-Console.WriteLine($">>> {library.Name} <<<");
-Console.WriteLine($"Игр в библиотеке: {library.Games.Count}");
+Console.WriteLine($"Повтор DOOM принят: {library.AddGame(new Game(" doom ", "Shooter", 2016, 8.8))}");
 
-if (library.Games.Count > 0) {
-    Console.WriteLine($"Первая: {library.Games[0].Title}");
-    Console.WriteLine($"Последняя: {library.Games[library.Games.Count - 1].Title}");
+List<Game> games = library.GetGames();
+
+Console.WriteLine($"\n>>> {library.Name} <<<");
+Console.WriteLine($"Игр в библиотеке: {library.GameCount}");
+
+if (games.Count > 0) {
+    Console.WriteLine($"Первая: {games[0].Title}");
+    Console.WriteLine($"Последняя: {games[games.Count - 1].Title}");
 }
 
 Console.WriteLine();
-foreach (Game game in library.Games) {
+foreach (Game game in games) {
     game.PrintInfo();
     Console.WriteLine();
 }
 
-int topRatedCount = 0;
-foreach (Game game in library.Games) {
-    if (game.Rating >= 9.0) {
-        topRatedCount += 1;
-    }
+Game? foundGame = library.FindGameByTitle("  satisfactory  ");
+if (foundGame != null) {
+    Console.WriteLine($"Найдена игра: {foundGame.Title} (рейтинг {foundGame.Rating})");
+} else {
+    Console.WriteLine("Игра не найдена.");
 }
-Console.WriteLine($"Игр с рейтингом от 9.0: {topRatedCount}");
 
-game2.AddHours(15);
-Console.WriteLine($"Часов в {game2.Title} через переменную: {game2.Hours_Played}");
-Console.WriteLine($"Часов в {library.Games[1].Title} через список: {library.Games[1].Hours_Played}");
+Game? missingGame = library.FindGameByTitle("Half-Life 3");
+if (missingGame != null) {
+    Console.WriteLine($"Найдена игра: {missingGame.Title}");
+} else {
+    Console.WriteLine("По запросу «Half-Life 3» ничего не найдено.");
+}
 
+Console.WriteLine($"Игр с рейтингом от 9.0: {library.CountTopRated(9.0)}");
 
-
-
-
-
+Console.WriteLine($"Игр до удаления: {library.GameCount}");
+Console.WriteLine($"Удалена Cyberpunk 2077: {library.RemoveGame("cyberpunk 2077")}");
+Console.WriteLine($"Игр после удаления: {library.GameCount}");
