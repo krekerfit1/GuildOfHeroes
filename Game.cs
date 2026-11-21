@@ -52,18 +52,21 @@ public class Game {
         IsInstalled = isInstalled;
     }
 
-    // вторая
-    public void AddHours(int hours) {
-        if (hours <= 0) {
-            return;
-        }
-
-        if (hours > 2147483647 - Hours_Played) {
-            return;
-        }
-
-        Hours_Played += hours;
+    public bool CanAddHours(int hours) {
+    if (hours <= 0) {
+        return false;
     }
+
+    return hours <= int.MaxValue - Hours_Played;
+}
+
+    public void AddHours(int hours) {
+    if (!CanAddHours(hours)) {
+        return;
+    }
+
+    Hours_Played += hours;
+}
 
     // вторая
     public void ChangeRating(double newRating) {

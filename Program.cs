@@ -25,7 +25,6 @@ Quest floatQuest = new Quest(101, "Вернуть поплавок", 100, 30);
 Console.WriteLine($"Поручение добавлено: {board.AddQuest(floatQuest)}");
 Console.WriteLine($">>> №{floatQuest.Id}: {floatQuest.Title} <<<");
 
-
 Console.WriteLine($"Назначение Сергея: {board.TryAssign(101, " сЕрГеЙ ")}");
 Hero? assigned = floatQuest.AssignedHero;
 if (assigned != null) {
@@ -38,12 +37,13 @@ Console.WriteLine($"Опыт после завершения: {sergey.Experience
 Console.WriteLine($"Повторное завершение: {board.TryComplete(101)}");
 Console.WriteLine($"Опыт после повтора: {sergey.Experience}");
 
-
-
+Console.WriteLine();
+Console.WriteLine(floatQuest.GetInfo());
+Console.WriteLine(sergey.GetInfo());
 
 //=============================================
 
-Console.WriteLine("\n--- Самостоятельная работа ---");
+Console.WriteLine("\n-------------------------------------------------- Самостоятельная работа --------------------------------------------------");
 
 Game game1 = new Game("Witcher 3", "RPG", 2015, 9.5, 45, true);
 Game game2 = new Game("Cyberpunk 2077", "Action-RPG", 2020, 8.0, 10, false);
@@ -93,3 +93,20 @@ Console.WriteLine($"Игр с рейтингом от 9.0: {library.CountTopRate
 Console.WriteLine($"Игр до удаления: {library.GameCount}");
 Console.WriteLine($"Удалена Cyberpunk 2077: {library.RemoveGame("cyberpunk 2077")}");
 Console.WriteLine($"Игр после удаления: {library.GameCount}");
+
+
+PlaySession session = new PlaySession(1, 5);
+
+Console.WriteLine($"Старт на неустановленном Cyberpunk 2077: {session.TryStart(game2)}");
+Console.WriteLine($"Старт на Witcher 3: {session.TryStart(game1)}");
+Console.WriteLine($"Часы Witcher 3 после старта: {game1.Hours_Played}");
+
+Console.WriteLine($"Завершение сессии: {session.TryFinish()}");
+Console.WriteLine($"Повторное завершение: {session.TryFinish()}");
+
+Game? updatedWitcher = library.FindGameByTitle("  witcher 3  ");
+if (updatedWitcher != null) {
+    Console.WriteLine($"В библиотеке у {updatedWitcher.Title}: {updatedWitcher.Hours_Played} ч. (пройдена: {updatedWitcher.IsCompleted()})");
+}
+
+Console.WriteLine(session.GetInfo());
