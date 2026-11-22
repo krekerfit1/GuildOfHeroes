@@ -21,24 +21,29 @@ Console.WriteLine();
 
 QuestBoard board = new QuestBoard(guild);
 
-Quest floatQuest = new Quest(101, "Вернуть поплавок", 100, 30);
-Console.WriteLine($"Поручение добавлено: {board.AddQuest(floatQuest)}");
-Console.WriteLine($">>> №{floatQuest.Id}: {floatQuest.Title} <<<");
+board.AddQuest(new Quest(101, "Вернуть поплавок", 100, 30));
+board.TryAssign(101, "Сергей");
+board.TryComplete(101);
 
-Console.WriteLine($"Назначение Сергея: {board.TryAssign(101, " сЕрГеЙ ")}");
-Hero? assigned = floatQuest.AssignedHero;
-if (assigned != null) {
-    Console.WriteLine($"Исполнитель: {assigned.Name}");
-}
-Console.WriteLine($"Опыт после назначения: {sergey.Experience}");
+board.AddQuest(new Quest(102, "Проверить нижнюю площадку", 100, 10));
+board.AddQuest(new Quest(103, "Снять мерки для насоса больницы", 100, 20));
+board.AddQuest(new Quest(104, "Обследовать ответвление", 100, 15));
 
-Console.WriteLine($"Завершение: {board.TryComplete(101)}");
-Console.WriteLine($"Опыт после завершения: {sergey.Experience}");
-Console.WriteLine($"Повторное завершение: {board.TryComplete(101)}");
-Console.WriteLine($"Опыт после повтора: {sergey.Experience}");
+Console.WriteLine($"Сергей на №102: {board.TryAssign(102, "Сергей")}");
+Console.WriteLine($"Сергей на №103: {board.TryAssign(103, "Сергей")}");
+Console.WriteLine($"Отмена №102: {board.TryCancel(102)}");
+Console.WriteLine($"Сергей на №103: {board.TryAssign(103, "Сергей")}");
+Console.WriteLine($"Завершение №103: {board.TryComplete(103)}");
+Console.WriteLine($"Ярослав на №104: {board.TryAssign(104, "Ярослав")}");
+Console.WriteLine($"Удалить Сергея: {board.TryRemoveMember("Сергей")}");
 
 Console.WriteLine();
-Console.WriteLine(floatQuest.GetInfo());
+List<Quest> quests = board.GetQuests();
+foreach (Quest quest in quests) {
+    Console.WriteLine(quest.GetInfo());
+}
+
+Console.WriteLine();
 Console.WriteLine(sergey.GetInfo());
 
 //=============================================
@@ -94,19 +99,21 @@ Console.WriteLine($"Игр до удаления: {library.GameCount}");
 Console.WriteLine($"Удалена Cyberpunk 2077: {library.RemoveGame("cyberpunk 2077")}");
 Console.WriteLine($"Игр после удаления: {library.GameCount}");
 
+PlaySession session1 = new PlaySession(1, 5);
+PlaySession session2 = new PlaySession(2, 3);
+library.AddSession(session1);
+library.AddSession(session2);
 
-PlaySession session = new PlaySession(1, 5);
+Console.WriteLine($"Старт сессии №1 (Witcher 3): {library.TryStartSession(1, "Witcher 3")}");
+Console.WriteLine($"Старт сессии №2 (Witcher 3, пока занята): {library.TryStartSession(2, "Witcher 3")}");
+Console.WriteLine($"Отмена сессии №1: {library.TryCancelSession(1)}");
+Console.WriteLine($"Старт сессии №2 после отмены №1: {library.TryStartSession(2, "Witcher 3")}");
+Console.WriteLine($"Завершение сессии №2: {library.TryFinishSession(2)}");
 
-Console.WriteLine($"Старт на неустановленном Cyberpunk 2077: {session.TryStart(game2)}");
-Console.WriteLine($"Старт на Witcher 3: {session.TryStart(game1)}");
-Console.WriteLine($"Часы Witcher 3 после старта: {game1.Hours_Played}");
-
-Console.WriteLine($"Завершение сессии: {session.TryFinish()}");
-Console.WriteLine($"Повторное завершение: {session.TryFinish()}");
+Console.WriteLine(session1.GetInfo());
+Console.WriteLine(session2.GetInfo());
 
 Game? updatedWitcher = library.FindGameByTitle("  witcher 3  ");
 if (updatedWitcher != null) {
     Console.WriteLine($"В библиотеке у {updatedWitcher.Title}: {updatedWitcher.Hours_Played} ч. (пройдена: {updatedWitcher.IsCompleted()})");
 }
-
-Console.WriteLine(session.GetInfo());

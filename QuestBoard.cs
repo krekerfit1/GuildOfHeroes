@@ -10,6 +10,9 @@ public class QuestBoard {
         if (FindQuest(quest.Id) != null) {
             return false;
         }
+        if (quest.Status != QuestStatus.Open) {
+        return false;
+        }
         _quests.Add(quest);
         return true;
     }
@@ -23,6 +26,15 @@ public class QuestBoard {
 }
 
 
+    public bool IsAssigned(Hero hero) {
+        foreach (Quest quest in _quests) {
+            if (quest.Status == QuestStatus.Assigned && quest.AssignedHero == hero) {
+                return true;
+            }
+        }
+        return false;
+}
+
 
     public bool TryAssign(int questId, string heroName) {
     Quest? quest = FindQuest(questId);
@@ -35,7 +47,21 @@ public class QuestBoard {
         return false;
     }
 
+    if (IsAssigned(hero)) {
+        return false;
+    }
+
     return quest.TryAssign(hero);
+}
+    public bool TryCancel(int questId) {
+        Quest? quest = FindQuest(questId);
+        if (quest == null) {
+            return false;
+        }
+        return quest.TryCancel();
+}
+    public List<Quest> GetQuests() {
+        return new List<Quest>(_quests);
 }
 
 
@@ -47,4 +73,21 @@ public class QuestBoard {
         }
         return null;
     }
+
+
+    public bool TryRemoveMember(string heroName) {
+    Hero? hero = _guild.FindHeroByName(heroName);
+    if (hero == null) {
+        return false;
+    }
+
+    foreach (Quest quest in _quests) {
+        if (quest.AssignedHero == hero) {
+            return false;
+        }
+    }
+
+    return _guild.RemoveHero(hero.Name);
+}
+
 }

@@ -2,20 +2,17 @@ public class PlaySession {
     public int Id { get; private set; }
     public int PlannedHours { get; private set; }
     public Game? TargetGame { get; private set; }
-    public bool IsFinished { get; private set; }
+    public PlaySessionStatus Status { get; private set; }
 
     public PlaySession(int id, int plannedHours) {
         Id = id;
         PlannedHours = plannedHours < 1 ? 1 : plannedHours;
         TargetGame = null;
-        IsFinished = false;
+        Status = PlaySessionStatus.Open;
     }
 
     public bool TryStart(Game game) {
-        if (IsFinished) {
-            return false;
-        }
-        if (TargetGame != null) {
+        if (Status != PlaySessionStatus.Open) {
             return false;
         }
         if (!game.IsInstalled) {
@@ -23,11 +20,12 @@ public class PlaySession {
         }
 
         TargetGame = game;
+        Status = PlaySessionStatus.Active;
         return true;
     }
 
     public bool TryFinish() {
-        if (IsFinished) {
+        if (Status != PlaySessionStatus.Active) {
             return false;
         }
 
@@ -43,13 +41,36 @@ public class PlaySession {
         }
 
         game.AddHours(PlannedHours);
-        IsFinished = true;
+        Status = PlaySessionStatus.Finished;
         return true;
+    }
+
+    public bool TryCancel() {
+        if (Status != PlaySessionStatus.Open && Status != PlaySessionStatus.Active) {
+            return false;
+        }
+
+        Status = PlaySessionStatus.Cancelled;
+        return true;
+    }
+
+    public string GetStatusText() {
+        switch (Status) {
+            case PlaySessionStatus.Open:
+                return "открыта";
+            case PlaySessionStatus.Active:
+                return "активна";
+            case PlaySessionStatus.Finished:
+                return "завершена";
+            case PlaySessionStatus.Cancelled:
+                return "отменена";
+            default:
+                return "неизвестно";
+        }
     }
 
     public string GetInfo() {
         string gameText = TargetGame != null ? TargetGame.Title : "не выбрана";
-        string doneText = IsFinished ? "да" : "нет";
-        return $"Сессия №{Id} ({PlannedHours} ч.): игра {gameText}, завершена: {doneText}";
+        return $"Сессия №{Id} ({PlannedHours} ч.): {GetStatusText()}, игра {gameText}";
     }
 }

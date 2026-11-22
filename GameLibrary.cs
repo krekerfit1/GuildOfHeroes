@@ -62,4 +62,71 @@ public class GameLibrary {
         }
         return count;
     }
+
+
+    private List<PlaySession> _sessions = new List<PlaySession>();
+
+public bool AddSession(PlaySession session) {
+    if (session.Status != PlaySessionStatus.Open) {
+        return false;
+    }
+    if (FindSession(session.Id) != null) {
+        return false;
+    }
+
+    _sessions.Add(session);
+    return true;
+}
+
+public PlaySession? FindSession(int sessionId) {
+    foreach (PlaySession session in _sessions) {
+        if (session.Id == sessionId) {
+            return session;
+        }
+    }
+    return null;
+}
+
+public bool IsGameBusy(Game game) {
+    foreach (PlaySession session in _sessions) {
+        if (session.Status == PlaySessionStatus.Active && session.TargetGame == game) {
+            return true;
+        }
+    }
+    return false;
+}
+
+public bool TryStartSession(int sessionId, string gameTitle) {
+    PlaySession? session = FindSession(sessionId);
+    if (session == null) {
+        return false;
+    }
+
+    Game? game = FindGameByTitle(gameTitle);
+    if (game == null) {
+        return false;
+    }
+
+    if (IsGameBusy(game)) {
+        return false;
+    }
+
+    return session.TryStart(game);
+}
+
+public bool TryFinishSession(int sessionId) {
+    PlaySession? session = FindSession(sessionId);
+    if (session == null) {
+        return false;
+    }
+    return session.TryFinish();
+}
+
+public bool TryCancelSession(int sessionId) {
+    PlaySession? session = FindSession(sessionId);
+    if (session == null) {
+        return false;
+    }
+    return session.TryCancel();
+}
 }

@@ -4,7 +4,7 @@ public class Quest {
     public int MinHealth { get; private set; }
     public int Reward { get; private set; }
     public Hero? AssignedHero { get; private set; }
-    public bool IsCompleted { get; private set; }
+    public QuestStatus Status { get; private set; }
 
     public Quest(int id, string title, int minHealth, int reward) {
         Id = id;
@@ -26,14 +26,11 @@ public class Quest {
         }
 
         AssignedHero = null;
-        IsCompleted = false;
+        Status = QuestStatus.Open;
     }
 
     public bool TryAssign(Hero hero) {
-        if (IsCompleted) {
-            return false;
-        }
-        if (AssignedHero != null) {
+        if (Status != QuestStatus.Open) {
             return false;
         }
         if (!hero.IsAlive()) {
@@ -44,11 +41,12 @@ public class Quest {
         }
 
         AssignedHero = hero;
+        Status = QuestStatus.Assigned;
         return true;
     }
 
     public bool TryComplete() {
-        if (IsCompleted) {
+        if (Status != QuestStatus.Assigned) {
             return false;
         }
 
@@ -67,8 +65,32 @@ public class Quest {
         }
 
         hero.GainExperience(Reward);
-        IsCompleted = true;
+        Status = QuestStatus.Completed;
         return true;
+    }
+
+    public bool TryCancel() {
+        if (Status != QuestStatus.Open && Status != QuestStatus.Assigned) {
+            return false;
+        }
+
+        Status = QuestStatus.Cancelled;
+        return true;
+    }
+
+    public string GetStatusText() {
+        switch (Status) {
+            case QuestStatus.Open:
+                return "открыто";
+            case QuestStatus.Assigned:
+                return "назначено";
+            case QuestStatus.Completed:
+                return "выполнено";
+            case QuestStatus.Cancelled:
+                return "отменено";
+            default:
+                return "неизвестно";
+        }
     }
 
     public string GetInfo() {
@@ -77,11 +99,6 @@ public class Quest {
             heroText = AssignedHero.Name;
         }
 
-        string doneText = "нет";
-        if (IsCompleted) {
-            doneText = "да";
-        }
-
-        return $"№{Id} «{Title}»: исполнитель {heroText}, выполнено: {doneText}";
+        return $"№{Id} «{Title}»: {GetStatusText()}, исполнитель {heroText}";
     }
 }
